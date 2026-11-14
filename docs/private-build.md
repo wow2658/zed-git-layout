@@ -3,12 +3,14 @@
 ## 현재 배포 기준
 
 - 공식 기반: `v1.28.1`, `e8bc16acee5ae1937600d571d441c4b5d7b0d288`
-- 개인 패키지: `1.28.1-custom.1`
-- 패키지 소스: `3c13e6fc83b5cf04df323fd1794034ecbb039f25`
+- 개인 패키지: `1.28.1-custom.2`
+- 패키지 소스: 태그 `v1.28.1-custom.2`가 가리키는 커밋과 Release ZIP의 `manifest.json`
 - 실행 파일 SHA-256: `DEC3EF302CCB700833553D8D1D2D11107B31C5E5CB3577E9DBA85CC40FFC1C8E`
 - 타깃: Windows x64, Rust 1.98.1, MSVC
 
-현재 ZIP은 이 소스 체크포인트에 태그 `v1.28.1-custom.1`을 붙여 관리한다. 이후 저장소 안내 문서만 바뀌어도 이 태그와 ZIP은 바꾸지 않는다. 기능이나 패키지를 수정하면 새 버전을 만든다.
+GitHub 보관을 위해 개인 커밋 이메일을 GitHub noreply 주소로 바꿨다. 기존 로컬 `custom.1`은 보관하고, 같은 실행 파일로 `custom.2`를 새로 패키징했다.
+
+현재 ZIP은 이 소스 체크포인트에 태그 `v1.28.1-custom.2`을 붙여 관리한다. 이후 저장소 안내 문서만 바뀌어도 이 태그와 ZIP은 바꾸지 않는다. 기능이나 패키지를 수정하면 새 버전을 만든다.
 
 ## 새 PC에서 소스 받기
 
@@ -45,7 +47,7 @@ git merge --no-ff --no-commit vX.Y.Z
 
 ## Windows 빌드
 
-처음에는 [공식 Windows 빌드 안내](development/windows.md)의 C++ 빌드 도구, Windows SDK, Rust, CMake 등 요구사항을 준비한다.
+처음에는 [공식 Windows 빌드 안내](src/development/windows.md)의 C++ 빌드 도구, Windows SDK, Rust, CMake 등 요구사항을 준비한다.
 
 현재 기반 버전에서는 다음 스크립트로 embedded assets를 포함해 GUI와 CLI를 빌드할 수 있다.
 
@@ -63,12 +65,12 @@ powershell -ExecutionPolicy Bypass -File script/private-distribution/Build.ps1 -
 4. `Build-Package.ps1`에 새 개인 버전, 실행 파일, runtime 위치, 실행 파일 SHA-256, 생성한 고지를 전달한다.
 5. 설치·재설치·제거, 사용자 설정 유지, ZIP/소스/체크섬, 실제 GUI 기능을 확인한다.
 
-예를 들어 같은 공식 기반에서 두 번째 개인 패키지는 `1.28.1-custom.2`, 다른 공식 기반으로 옮기면 `X.Y.Z-custom.1`처럼 구분한다.
+예를 들어 같은 공식 기반에서 다음 개인 패키지는 `1.28.1-custom.3`, 다른 공식 기반으로 옮기면 `X.Y.Z-custom.1`처럼 구분한다.
 
 ```powershell
 $guiHash = (Get-FileHash target/debug/zed.exe -Algorithm SHA256).Hash
 & script/private-distribution/Build-Package.ps1 `
-    -Version '1.28.1-custom.2' `
+    -Version '1.28.1-custom.3' `
     -OutputDirectory 'C:\dev\zed-private-releases' `
     -ExecutablePath "$PWD\target\debug\zed.exe" `
     -ExpectedExecutableSha256 $guiHash `
@@ -81,12 +83,12 @@ $guiHash = (Get-FileHash target/debug/zed.exe -Algorithm SHA256).Hash
 코드만 Git에 push하고 ZIP은 Release asset으로 올린다. 아래 버전과 파일 경로는 실제 검증한 것으로 바꾼다. 같은 버전의 ZIP을 몰래 바꾸거나 기존 태그를 강제로 이동하지 않는다.
 
 ```powershell
-git tag -a v1.28.1-custom.2 <검증한-소스-커밋> -m 'Zed Git Layout 1.28.1-custom.2'
+git tag -a v1.28.1-custom.3 <검증한-소스-커밋> -m 'Zed Git Layout 1.28.1-custom.3'
 git push origin HEAD:main
-git push origin v1.28.1-custom.2
-gh release create v1.28.1-custom.2 <ZIP> <ZIP.sha256> <검증JSON> `
+git push origin v1.28.1-custom.3
+gh release create v1.28.1-custom.3 <ZIP> <ZIP.sha256> <검증JSON> `
     --repo wow2658/zed-git-layout --verify-tag `
-    --title 'Zed Git Layout 1.28.1-custom.2' --notes-file <릴리스설명파일>
+    --title 'Zed Git Layout 1.28.1-custom.3' --notes-file <릴리스설명파일>
 ```
 
 Release의 소스 커밋, 패키지 manifest, 소스 ZIP, 실행 파일 해시가 일치하는지 확인한다. 다른 사람과 공유할 때는 비공개 저장소 접근 권한을 부여하거나 소스와 라이선스를 포함한 배포 ZIP 전체를 전달한다.

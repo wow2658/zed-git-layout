@@ -4,7 +4,9 @@
 
 **[최신 개인 배포본 다운로드](https://github.com/wow2658/zed-git-layout/releases/latest)** · [전체 배포 이력](https://github.com/wow2658/zed-git-layout/releases) · [업데이트·빌드 방법](../docs/private-build.md)
 
-현재 배포 버전은 **1.28.1-custom.1**, 기반 공식 버전은 **Zed 1.28.1**입니다.
+현재 배포 버전은 **1.28.1-custom.2**, 기반 공식 버전은 **Zed 1.28.1**입니다.
+
+`custom.2`는 GitHub 보관용 소스 기록을 정리한 패키지입니다. 로컬에서 먼저 만든 `custom.1`과 실행 파일은 같습니다.
 
 ## 설치와 재설치
 
@@ -27,7 +29,7 @@
 | 위치 | 내용 |
 | --- | --- |
 | `main` | 현재 개인 수정 소스와 배포 도구 |
-| `v1.28.1-custom.1` 같은 태그 | 배포 ZIP의 소스 체크포인트 |
+| `v1.28.1-custom.2` 같은 태그 | 배포 ZIP의 소스 체크포인트 |
 | Releases | 설치 ZIP, SHA-256, 검증 결과 |
 | 로컬 `origin` | 이 비공개 저장소 |
 | 로컬 `upstream` | 공식 [zed-industries/zed](https://github.com/zed-industries/zed) |

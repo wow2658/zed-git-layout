@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [string]$Version = '1.28.1-custom.1',
+    [string]$Version = '1.28.1-custom.2',
     [string]$OutputDirectory = 'C:\dev\zed-private-releases',
     [string]$ExecutablePath,
     [string]$RuntimeDirectory = (Join-Path $env:LOCALAPPDATA 'Programs\Zed'),
