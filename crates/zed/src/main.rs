@@ -1,5 +1,4 @@
-// Disable command line from opening on release mode
-#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+#![cfg_attr(target_os = "windows", windows_subsystem = "windows")]
 
 mod reliability;
 mod watcher_debug;
@@ -850,7 +849,9 @@ fn main() {
         load_user_themes_in_background(fs.clone(), cx);
         watch_themes(fs.clone(), cx);
         #[cfg(debug_assertions)]
-        watch_languages(fs.clone(), app_state.languages.clone(), cx);
+        if *release_channel::RELEASE_CHANNEL == ReleaseChannel::Dev {
+            watch_languages(fs.clone(), app_state.languages.clone(), cx);
+        }
 
         let menus = app_menus(cx);
         cx.set_menus(menus);
