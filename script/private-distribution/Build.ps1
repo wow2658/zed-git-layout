@@ -49,6 +49,7 @@ $mappings = @(
 )
 $remappingFlags = @()
 $nativeMappings = @()
+$fileSystem = New-Object -ComObject Scripting.FileSystemObject
 foreach ($mapping in $mappings) {
     if (-not $mapping.From) { continue }
     $prefix = [IO.Path]::GetFullPath($mapping.From).TrimEnd('\')
@@ -57,6 +58,13 @@ foreach ($mapping in $mappings) {
         $remappingFlags += ConvertTo-Json -InputObject $flag -Compress
     }
     $nativeMappings += '/pathmap:"' + $prefix + '=' + $mapping.To + '"'
+    # Native dependencies may shorten source paths to Windows 8.3 names.
+    if ($fileSystem.FolderExists($prefix)) {
+        $shortPrefix = $fileSystem.GetFolder($prefix).ShortPath
+        if ($shortPrefix -and $shortPrefix -ne $prefix) {
+            $nativeMappings += '/pathmap:"' + $shortPrefix + '=' + $mapping.To + '"'
+        }
+    }
 }
 # MSVC uses the first matching mapping; rustc uses the last matching mapping.
 [array]::Reverse($nativeMappings)

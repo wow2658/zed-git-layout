@@ -14,6 +14,15 @@ $prefixes = @(
     @{ Category = 'SourceCheckout'; Value = $SourceDirectory }
 )
 $accountName = [IO.Path]::GetFileName($env:USERPROFILE.TrimEnd('\'))
+$fileSystem = New-Object -ComObject Scripting.FileSystemObject
+$shortUserDirectory = $fileSystem.GetFolder($env:USERPROFILE).ShortPath
+if ($shortUserDirectory -and $shortUserDirectory -ne $env:USERPROFILE) {
+    $prefixes += @{ Category = 'WindowsShortUserDirectory'; Value = $shortUserDirectory }
+    $shortAccountName = [IO.Path]::GetFileName($shortUserDirectory.TrimEnd('\'))
+    if ($shortAccountName.Length -ge 6) {
+        $prefixes += @{ Category = 'WindowsShortAccountName'; Value = $shortAccountName }
+    }
+}
 if ($accountName.Length -ge 6 -and $accountName -notin @('Administrator', 'Default', 'Public', 'RunnerAdmin', 'Runner')) {
     $prefixes += @{ Category = 'WindowsAccountName'; Value = $accountName }
 }
