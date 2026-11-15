@@ -1,15 +1,17 @@
 [CmdletBinding()]
 param(
-    [string]$Version = '1.28.1-custom.2',
+    [string]$Version = '1.28.1-custom.3',
     [string]$OutputDirectory = 'C:\dev\zed-private-releases',
     [string]$ExecutablePath,
+    [string]$CliExecutablePath,
     [string]$RuntimeDirectory = (Join-Path $env:LOCALAPPDATA 'Programs\Zed'),
     [Parameter(Mandatory = $true)][string]$DependencyLicenses,
-    [string]$ExpectedExecutableSha256 = 'DEC3EF302CCB700833553D8D1D2D11107B31C5E5CB3577E9DBA85CC40FFC1C8E'
+    [Parameter(Mandatory = $true)][string]$ExpectedExecutableSha256
 )
 . (Join-Path $PSScriptRoot 'Common.ps1')
 $repository = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..\..')).Path
-if (-not $ExecutablePath) { $ExecutablePath = Join-Path $repository 'target\debug\zed.exe' }
+if (-not $ExecutablePath) { $ExecutablePath = Join-Path $repository 'target\private\release-fast\zed.exe' }
+if (-not $CliExecutablePath) { $CliExecutablePath = Join-Path ([IO.Path]::GetDirectoryName($ExecutablePath)) 'cli.exe' }
 if ($Version -notmatch '^[A-Za-z0-9][A-Za-z0-9._-]{0,80}$') { throw 'Invalid release version.' }
 if ((Get-FileHash -LiteralPath $ExecutablePath -Algorithm SHA256).Hash -ne $ExpectedExecutableSha256) {
     throw 'The executable differs from the expected private build. Verify it and supply the correct hash.'
@@ -30,13 +32,19 @@ try {
         New-Item -ItemType Directory -Path (Join-Path $packageRoot $directory) -Force | Out-Null
     }
     Copy-Item -LiteralPath $ExecutablePath -Destination (Join-Path $packageRoot 'app\Zed.exe')
-    foreach ($file in @('bin\Zed.exe', 'conpty.dll', 'OpenConsole.exe', 'x64\OpenConsole.exe', 'arm64\OpenConsole.exe', 'amd_ags_x64.dll')) {
+    Copy-Item -LiteralPath $CliExecutablePath -Destination (Join-Path $packageRoot 'app\bin\Zed.exe')
+    foreach ($file in @('conpty.dll', 'OpenConsole.exe', 'x64\OpenConsole.exe', 'arm64\OpenConsole.exe', 'amd_ags_x64.dll')) {
         Copy-Item -LiteralPath (Join-Path $RuntimeDirectory $file) -Destination (Join-Path $packageRoot ('app\' + $file))
     }
     foreach ($file in @('Install.ps1', 'Uninstall.ps1', 'Common.ps1', 'Install.cmd', 'Uninstall.cmd', 'README.ko.txt')) {
         Copy-Item -LiteralPath (Join-Path $PSScriptRoot $file) -Destination $packageRoot
     }
     Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'Build.ps1') -Destination (Join-Path $packageRoot 'source\Build.ps1')
+    Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'Verify-Privacy.ps1') -Destination (Join-Path $packageRoot 'source\Verify-Privacy.ps1')
+    $binaryPaths = @(Get-ChildItem -LiteralPath (Join-Path $packageRoot 'app') -File -Recurse |
+        Where-Object { $_.Extension -in @('.exe', '.dll') } | ForEach-Object { $_.FullName })
+    & (Join-Path $PSScriptRoot 'Verify-Privacy.ps1') -BinaryPaths $binaryPaths -SourceDirectory $repository `
+        -ScanRoot (Join-Path $packageRoot 'app') -ReportPath (Join-Path $packageRoot 'PRIVACY-CHECK.json')
     foreach ($file in @('LICENSE-GPL', 'LICENSE-APACHE')) {
         Copy-Item -LiteralPath (Join-Path $repository $file) -Destination (Join-Path $packageRoot ('licenses\' + $file))
     }
@@ -67,14 +75,15 @@ Package version: $Version
 Upstream version: 1.28.1
 Upstream source: https://github.com/zed-industries/zed/tree/e8bc16acee5ae1937600d571d441c4b5d7b0d288
 Private source checkpoint: $sourceCommit
-Modification date: 2026-11-15
+Modification date: $([DateTime]::UtcNow.ToString('yyyy-MM-dd'))
 Target: x86_64-pc-windows-msvc
 Rust: 1.98.1
-Build: ZED_RELEASE_CHANNEL=stable cargo +1.98.1 build -p zed --locked --features util/debug-embed
-Profile: dev; debug=0; build-override.debug=0; embedded assets; static MSVC CRT
+Build: script/private-distribution/Build.ps1; ZED_RELEASE_CHANNEL=stable
+Profile: release-fast; debug=0; build-override.debug=0; embedded assets; static MSVC CRT
+Path privacy: rustc remap-path-prefix and MSVC deterministic pathmap; local path scan required
 Executable SHA256: $ExpectedExecutableSha256
 Signing: unsigned
-CLI: unmodified official Zed 1.28.1 CLI; its --version reports the upstream base commit
+CLI: rebuilt from the same private source checkpoint with path remapping
 ConPTY/OpenConsole: Microsoft.Windows.Console.ConPTY 1.25.260710002-preview
 AMD AGS: 6.3.0
 Dependency notices: cargo-about 0.8.2; Windows x64; zed package with util/debug-embed

@@ -28,7 +28,8 @@ Windows의 안정 채널 단일 실행 제한을 공유하므로 공식 Zed와 �
 사용자 데이터 형식이 달라지는 버전으로 이동할 때는 UserData 폴더를 먼저 백업하세요.
 
 실행 문제
-이 패키지는 Windows x64용이며 디지털 서명 없는 개발 빌드입니다.
+이 패키지는 Windows x64용이며 디지털 서명 없는 개인 빌드입니다.
+개발자 PC의 사용자명과 빌드 폴더가 남지 않도록 경로 치환을 적용하고 PRIVACY-CHECK.json으로 검사합니다.
 다른 PC의 Smart App Control 등에서 실행이 차단될 수 있습니다. 설치 스크립트는 보안 설정을 변경하지 않습니다.
 Git 조작에는 Git for Windows가 필요합니다. Python, Rust, Visual Studio는 실행할 때 필요하지 않습니다.
 이 PC에서 확인한 환경은 Windows 11 x64입니다. 새 Windows 설치/다른 GPU에서의 동작까지 검증한 것은 아닙니다.

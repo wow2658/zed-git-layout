@@ -3,14 +3,14 @@
 ## 현재 배포 기준
 
 - 공식 기반: `v1.28.1`, `e8bc16acee5ae1937600d571d441c4b5d7b0d288`
-- 개인 패키지: `1.28.1-custom.2`
-- 패키지 소스: 태그 `v1.28.1-custom.2`가 가리키는 커밋과 Release ZIP의 `manifest.json`
-- 실행 파일 SHA-256: `DEC3EF302CCB700833553D8D1D2D11107B31C5E5CB3577E9DBA85CC40FFC1C8E`
+- 개인 패키지: `1.28.1-custom.3`
+- 패키지 소스: 태그 `v1.28.1-custom.3`가 가리키는 커밋과 Release ZIP의 `manifest.json`
+- 실행 파일 SHA-256: 해당 Release의 `manifest.json` 및 검증 결과 참고
 - 타깃: Windows x64, Rust 1.98.1, MSVC
 
-GitHub 보관을 위해 개인 커밋 이메일을 GitHub noreply 주소로 바꿨다. 기존 로컬 `custom.1`은 보관하고, 같은 실행 파일로 `custom.2`를 새로 패키징했다.
+GitHub 커밋 이메일은 noreply 주소를 사용한다. `custom.3`에서는 로컬 Windows 계정명과 빌드 경로를 치환해 GUI와 CLI를 다시 빌드했다. 이전 ZIP은 비공개 이력으로 보관한다.
 
-현재 ZIP은 이 소스 체크포인트에 태그 `v1.28.1-custom.2`을 붙여 관리한다. 이후 저장소 안내 문서만 바뀌어도 이 태그와 ZIP은 바꾸지 않는다. 기능이나 패키지를 수정하면 새 버전을 만든다.
+현재 ZIP은 이 소스 체크포인트에 태그 `v1.28.1-custom.3`을 붙여 관리한다. 이후 저장소 안내 문서만 바뀌어도 이 태그와 ZIP은 바꾸지 않는다. 기능이나 패키지를 수정하면 새 버전을 만든다.
 
 ## 새 PC에서 소스 받기
 
@@ -55,7 +55,15 @@ git merge --no-ff --no-commit vX.Y.Z
 powershell -ExecutionPolicy Bypass -File script/private-distribution/Build.ps1 -SourceDirectory .
 ```
 
-개발 빌드의 이미지·폰트 등이 소스 폴더 없이도 동작하도록 `util/debug-embed`를 사용한다. 표준 Visual Studio SDK 환경을 사용하기 어려운 기존 빌드 PC에서는 기존 SDK 환경 준비 스크립트를 먼저 적용해야 한다. 빌드 산출물을 혼동하지 않도록 공식 기반 버전과 실행 파일 해시를 기록한다.
+`release-fast` 프로필에서 디버그 정보를 끄고 이미지·폰트 등은 실행 파일에 포함한다. 산출물은 `target/private/release-fast`에 둔다. `util/debug-embed`도 지정해 소스 폴더 없이 실행되는 구성을 유지한다. 표준 Visual Studio SDK 환경을 사용하기 어려운 기존 빌드 PC에서는 기존 SDK 환경 준비 스크립트를 먼저 적용해야 한다. 빌드 산출물을 혼동하지 않도록 공식 기반 버전과 실행 파일 해시를 기록한다.
+
+### 빌드 경로 제거
+
+빌드 스크립트가 사용자 폴더, Cargo/Rustup 캐시, 소스 및 산출물 경로를 일반적인 가상 경로로 바꾼다. 원본 로컬 경로가 포함된 Cargo 설정은 임시 파일에만 생성하고 빌드 후 제거한다. 저장소의 기존 rustflags를 보존하기 위해 Cargo 설정 배열을 병합하며, 이를 우회하는 RUSTFLAGS 환경변수가 있으면 중단한다.
+
+Rust에는 `--remap-path-prefix`, MSVC에는 `/experimental:deterministic` 및 `/pathmap`을 적용한다. Rust는 마지막으로 일치하는 매핑을, MSVC는 먼저 일치하는 매핑을 사용하므로 순서를 반대로 지정한다. 외부 도구가 추가한 경로도 있을 수 있어 실제 실행 파일을 검사해야 한다.
+
+`Verify-Privacy.ps1`은 UTF-8 및 UTF-16LE로 남은 사용자명·로컬 경로를 검사한다. 패키지 생성 시 GUI, CLI 및 runtime 파일을 모두 검사하고 결과를 `PRIVACY-CHECK.json`에 넣는다. 이는 별도의 토큰·비밀값 검사와 함께 사용한다. 이 검사만으로 민감정보가 전혀 없다고 보장하지는 않는다.
 
 ## 다음 개인 패키지 만들기
 
@@ -65,14 +73,14 @@ powershell -ExecutionPolicy Bypass -File script/private-distribution/Build.ps1 -
 4. `Build-Package.ps1`에 새 개인 버전, 실행 파일, runtime 위치, 실행 파일 SHA-256, 생성한 고지를 전달한다.
 5. 설치·재설치·제거, 사용자 설정 유지, ZIP/소스/체크섬, 실제 GUI 기능을 확인한다.
 
-예를 들어 같은 공식 기반에서 다음 개인 패키지는 `1.28.1-custom.3`, 다른 공식 기반으로 옮기면 `X.Y.Z-custom.1`처럼 구분한다.
+예를 들어 같은 공식 기반에서 다음 개인 패키지는 `1.28.1-custom.4`, 다른 공식 기반으로 옮기면 `X.Y.Z-custom.1`처럼 구분한다.
 
 ```powershell
-$guiHash = (Get-FileHash target/debug/zed.exe -Algorithm SHA256).Hash
+$guiHash = (Get-FileHash target/private/release-fast/zed.exe -Algorithm SHA256).Hash
 & script/private-distribution/Build-Package.ps1 `
-    -Version '1.28.1-custom.3' `
+    -Version '1.28.1-custom.4' `
     -OutputDirectory 'C:\dev\zed-private-releases' `
-    -ExecutablePath "$PWD\target\debug\zed.exe" `
+    -ExecutablePath "$PWD\target\private\release-fast\zed.exe" `
     -ExpectedExecutableSha256 $guiHash `
     -RuntimeDirectory 'C:\path\to\matching\zed-runtime' `
     -DependencyLicenses 'C:\path\to\generated-licenses.md'
@@ -83,12 +91,12 @@ $guiHash = (Get-FileHash target/debug/zed.exe -Algorithm SHA256).Hash
 코드만 Git에 push하고 ZIP은 Release asset으로 올린다. 아래 버전과 파일 경로는 실제 검증한 것으로 바꾼다. 같은 버전의 ZIP을 몰래 바꾸거나 기존 태그를 강제로 이동하지 않는다.
 
 ```powershell
-git tag -a v1.28.1-custom.3 <검증한-소스-커밋> -m 'Zed Git Layout 1.28.1-custom.3'
+git tag -a v1.28.1-custom.4 <검증한-소스-커밋> -m 'Zed Git Layout 1.28.1-custom.4'
 git push origin HEAD:main
-git push origin v1.28.1-custom.3
-gh release create v1.28.1-custom.3 <ZIP> <ZIP.sha256> <검증JSON> `
+git push origin v1.28.1-custom.4
+gh release create v1.28.1-custom.4 <ZIP> <ZIP.sha256> <검증JSON> `
     --repo wow2658/zed-git-layout --verify-tag `
-    --title 'Zed Git Layout 1.28.1-custom.3' --notes-file <릴리스설명파일>
+    --title 'Zed Git Layout 1.28.1-custom.4' --notes-file <릴리스설명파일>
 ```
 
 Release의 소스 커밋, 패키지 manifest, 소스 ZIP, 실행 파일 해시가 일치하는지 확인한다. 다른 사람과 공유할 때는 비공개 저장소 접근 권한을 부여하거나 소스와 라이선스를 포함한 배포 ZIP 전체를 전달한다.

@@ -4,9 +4,9 @@
 
 **[최신 개인 배포본 다운로드](https://github.com/wow2658/zed-git-layout/releases/latest)** · [전체 배포 이력](https://github.com/wow2658/zed-git-layout/releases) · [업데이트·빌드 방법](../docs/private-build.md)
 
-현재 배포 버전은 **1.28.1-custom.2**, 기반 공식 버전은 **Zed 1.28.1**입니다.
+현재 배포 버전은 **1.28.1-custom.3**, 기반 공식 버전은 **Zed 1.28.1**입니다.
 
-`custom.2`는 GitHub 보관용 소스 기록을 정리한 패키지입니다. 로컬에서 먼저 만든 `custom.1`과 실행 파일은 같습니다.
+`custom.3`는 개발자 PC의 사용자명과 로컬 빌드 경로를 치환해 다시 빌드한 패키지입니다. GUI와 CLI를 함께 빌드하며, ZIP 생성 시 경로 검사에 통과해야 합니다.
 
 ## 설치와 재설치
 
@@ -29,7 +29,7 @@
 | 위치 | 내용 |
 | --- | --- |
 | `main` | 현재 개인 수정 소스와 배포 도구 |
-| `v1.28.1-custom.2` 같은 태그 | 배포 ZIP의 소스 체크포인트 |
+| `v1.28.1-custom.3` 같은 태그 | 배포 ZIP의 소스 체크포인트 |
 | Releases | 설치 ZIP, SHA-256, 검증 결과 |
 | 로컬 `origin` | 이 비공개 저장소 |
 | 로컬 `upstream` | 공식 [zed-industries/zed](https://github.com/zed-industries/zed) |
@@ -44,6 +44,6 @@ GitHub의 공개 fork와 별개의 저장소로 관리합니다. 공식 소스�
 
 복사된 공식 운영용 workflow가 실행되지 않도록 이 저장소의 GitHub Actions는 꺼두었습니다. 자동 업데이트·자동 배포는 설정하지 않았습니다.
 
-이 배포본은 미서명 개발 빌드입니다. 설치·재설치·제거는 Windows 11 x64의 임시 경로에서 검사했으며, 새 PC와 다른 GPU에서의 GUI 실행은 별도 확인이 필요합니다. 세부 검증 범위는 각 Release의 검증 JSON을 확인하세요.
+이 배포본은 미서명 개인 빌드입니다. 설치·재설치·제거는 Windows 11 x64의 임시 경로에서 검사했으며, 새 PC와 다른 GPU에서의 GUI 실행은 별도 확인이 필요합니다. 세부 검증 범위는 각 Release의 검증 JSON을 확인하세요.
 
 원본 소프트웨어의 라이선스와 제3자 고지는 유지합니다. 원래 Zed의 소개는 [기존 README](../README.md)에 있습니다.
