@@ -72,15 +72,19 @@ debug = 0
 $configurationPath = [IO.Path]::GetTempFileName()
 $previousCFlags = $env:CFLAGS
 $previousCxxFlags = $env:CXXFLAGS
+$previousShellEscapedFlags = $env:CC_SHELL_ESCAPED_FLAGS
 try {
     [IO.File]::WriteAllText($configurationPath, $configuration, [Text.UTF8Encoding]::new($false))
     $env:CFLAGS = ($previousCFlags + ' ' + ($nativeFlags -join ' ')).Trim()
     $env:CXXFLAGS = ($previousCxxFlags + ' ' + ($nativeFlags -join ' ')).Trim()
+    # cc-rs otherwise splits quoted MSVC directory mappings at spaces.
+    $env:CC_SHELL_ESCAPED_FLAGS = '1'
     cargo +1.98.1 --config $configurationPath build --profile release-fast --target-dir $TargetDirectory --locked -p zed -p cli --features util/debug-embed
     if ($LASTEXITCODE -ne 0) { throw 'Zed/CLI build failed.' }
 } finally {
     $env:CFLAGS = $previousCFlags
     $env:CXXFLAGS = $previousCxxFlags
+    $env:CC_SHELL_ESCAPED_FLAGS = $previousShellEscapedFlags
     Remove-Item -LiteralPath $configurationPath -Force
 }
 Write-Host "Binaries: $TargetDirectory\release-fast\zed.exe and cli.exe"
